@@ -37,17 +37,21 @@ public class Main {
 
         // 플레이어 입력 (명수, 이름)
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("몇명이서 플레이할건가요?");
+        System.out.print("몇명이서 플레이할건가요? : ");
         int n = Integer.parseInt(reader.readLine());
         ArrayList<String>[] player_card = new ArrayList[n];
 
         System.out.println("사용자 이름을 입력해주세요.");
         for(int i = 0; i < n; i=i+1) {
-            System.out.println((i+1) + "번째 유저 : ");
+            System.out.print((i+1) + "번째 유저 : ");
             String s = reader.readLine();
             map.put(i, s);
             player_card[i] = new ArrayList<>();
         }
+        System.out.println();
+
+        System.out.println("게임을 시작합니다.");
+        System.out.println();
 
         // 순서대로 카드 배부 (2중 배열로 저장)
         for(int i = 0; i < map.size(); i++) {
@@ -59,50 +63,56 @@ public class Main {
             player_card[i].add(cardGet);
         }
 
-        // 현재 가지고있는 카드 출력
-        System.out.println();
+        // 초기 가지고있는 카드 출력
         for(int i = 0; i < n; i++) {
-            System.out.print(map.get(i) + "가 보유한 카드  ");
+            long hidden = Math.round(Math.random());
+            System.out.print(map.get(i) + "님께서 보유한 카드  ");
             for(int j = 0; j < 2; j++) {
-                System.out.print(player_card[i].get(j) + " ");
+                if(hidden==j) System.out.print("[Hidden Card] ");
+                else System.out.print(player_card[i].get(j) + " ");
             }
+//            System.out.print("[Hidden Card] ");
+//            System.out.print(player_card[i].get(1) + " ");
             System.out.println();
         }
         System.out.println();
 
-        // natural인지 판단
-        boolean flag_natural = false;
+        // 추가로 뽑을지 선택
         for(int i = 0; i < n; i++) {
-            int sum = 0;
-            for(int j = 0; j < 2; j++) {
-                String tmp = player_card[i].get(j);
-                String tmp2 = tmp.substring(tmp.length()-1, tmp.length());
-                if(tmp2.equals("K") || tmp2.equals("Q") || tmp2.equals("J")) {
-                    continue;
-                }
-                if(tmp2.equals("A")) {
-                    sum++;
-                    continue;
-                }
-                sum += Integer.parseInt(tmp2);
-            }
+//            int sum = 0;
+//            for(int j = 0; j < 2; j++) {
+//                String tmp = player_card[i].get(j);
+//                String tmp2 = tmp.substring(tmp.length()-1, tmp.length());
+//                if(tmp2.equals("K") || tmp2.equals("Q") || tmp2.equals("J")) {
+//                    continue;
+//                }
+//                if(tmp2.equals("A")) {
+//                    sum++;
+//                    continue;
+//                }
+//                sum += Integer.parseInt(tmp2);
+//            }
+//
+//            if((sum%10) <= 7) {
+//                flag_natural = true;
+//                String cardGet = list.get(0);
+//                list.remove(0);
+//                player_card[i].add(cardGet);
+//            }
 
-            if((sum%10) <= 7) {
-                flag_natural = true;
+            System.out.println(map.get(i) + "님, 추가로 카드를 뽑으시겠습니까? (Yes/No)");
+            String s = reader.readLine();
+            if(s.equals("Yes")) {
                 String cardGet = list.get(0);
                 list.remove(0);
                 player_card[i].add(cardGet);
             }
         }
-
-        if(flag_natural) {
-            System.out.printf("Natural입니다. 카드를 추가로 받으려면 키를 입력하세요.");
-            reader.readLine();
-        }
+        System.out.println();
 
         // 현재 가지고있는 카드 출력
         for(int i = 0; i < n; i++) {
-            System.out.print(map.get(i) + "가 보유한 카드  ");
+            System.out.print(map.get(i) + "님께서 보유한 카드  ");
             for(int j = 0; j < player_card[i].size(); j++) {
                 System.out.print(player_card[i].get(j) + " ");
             }
@@ -130,12 +140,30 @@ public class Main {
             rank.put(map.get(i), sum%10);
         }
 
+        System.out.println("결과를 발표하겠습니다.");
+
         List<String> keySet = new ArrayList<>(rank.keySet());
         keySet.sort((o1, o2) -> rank.get(o2).compareTo(rank.get(o1)));
 
+        int max_value=-1;
+        StringBuilder winner = new StringBuilder();
+        winner.setLength(0);
+        boolean duplicated_winner = false;
         for(String key: keySet) {
             System.out.println(key + " " + rank.get(key));
+            if(max_value<rank.get(key)) {
+                duplicated_winner = false;
+                winner.append(key);
+                max_value = rank.get(key);
+            } else if (max_value == rank.get(key)) {
+                duplicated_winner = true;
+            }
         }
 
+        if(duplicated_winner) System.out.println("무승부입니다.");
+        else System.out.println("최종 우승자는" + winner + "입니다!");
+        System.out.println();
+
+        System.out.println("게임이 종료되었습니다.");
     }
 }
